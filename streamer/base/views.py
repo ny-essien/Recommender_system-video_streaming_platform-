@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Video, Category, WatchHistory, UserList
+from django.contrib.auth import login, authenticate, logout
 
 def home(request):
     # Get trending movies/shows
@@ -31,8 +32,32 @@ def home(request):
     
     return render(request, 'base/index.html', context)
 
-def login(request):
-    pass
+def sign_in(request):
+
+    if request.method == "POST":
+
+        username = request.POST["username"]
+        password = request.POST["password"]
+
+        user = authenticate(request, username = username, password = password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        
+    return render(request, 'base/signin.html')
+
+
+def sign_out(request):
+
+    logout(request)
+    return redirect('home')
+
+def register(request):
+    return render(request, "base/registration.html")
+
+def reset_password(request):
+    return render(request, "base/password_reset.html")
 
 def movies(request):
     movies = Video.objects.filter(content_type='movie')
